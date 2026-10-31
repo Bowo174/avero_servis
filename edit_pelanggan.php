@@ -89,88 +89,68 @@ if (isset($_POST["simpan"])) {
 
 <body>
 
-<div style="
+    <div style="
     max-width:600px;
     margin:40px auto;
     padding:20px;
     font-family:Arial,sans-serif;
 ">
 
-    <h2>Edit Pelanggan</h2>
+        <h2>Edit Pelanggan</h2>
 
-    <form method="post">
+        <form method="post">
 
-        <div style="margin-bottom:15px;">
+            <div style="margin-bottom:15px;">
 
-            <label>Nama</label>
+                <label>Nama</label>
 
-            <input
-                type="text"
-                name="nama"
-                value="<?php echo htmlspecialchars($data["nama"]); ?>"
-                style="
+                <input type="text" name="nama" value="<?php echo htmlspecialchars($data["nama"]); ?>" style="
                     width:100%;
                     padding:10px;
                     margin-top:5px;
                     box-sizing:border-box;
-                "
-            >
+                ">
 
-        </div>
+            </div>
 
-        <div style="margin-bottom:15px;">
+            <div style="margin-bottom:15px;">
 
-            <label>No. WhatsApp</label>
+                <label>No. WhatsApp</label>
 
-            <input
-                type="text"
-                name="no_telp"
-                value="<?php echo htmlspecialchars($data["no_telp"]); ?>"
-                style="
+                <input type="text" name="no_telp" value="<?php echo htmlspecialchars($data["no_telp"]); ?>" style="
                     width:100%;
                     padding:10px;
                     margin-top:5px;
                     box-sizing:border-box;
-                "
-            >
+                ">
 
-        </div>
+            </div>
 
-        <div style="margin-bottom:15px;">
+            <div style="margin-bottom:15px;">
 
-            <label>Alamat</label>
+                <label>Alamat</label>
 
-            <textarea
-                name="alamat"
-                rows="4"
-                style="
+                <textarea name="alamat" rows="4" style="
                     width:100%;
                     padding:10px;
                     margin-top:5px;
                     box-sizing:border-box;
-                "
-            ><?php echo htmlspecialchars($data["alamat"]); ?></textarea>
+                "><?php echo htmlspecialchars($data["alamat"]); ?></textarea>
 
-        </div>
+            </div>
 
-        <button
-            type="submit"
-            name="simpan"
-            style="
+            <button type="submit" name="simpan" style="
                 padding:10px 16px;
                 background:#16a34a;
                 color:white;
                 border:none;
                 border-radius:6px;
                 cursor:pointer;
-            "
-        >
-            💾 Simpan Perubahan
-        </button>
+            ">
+                💾 Simpan Perubahan
+            </button>
 
-        <a
-            href="pelanggan.php"
-            style="
+            <a href="pelanggan.php" style="
                 display:inline-block;
                 margin-left:8px;
                 padding:10px 16px;
@@ -178,14 +158,13 @@ if (isset($_POST["simpan"])) {
                 color:white;
                 text-decoration:none;
                 border-radius:6px;
-            "
-        >
-            Kembali
-        </a>
+            ">
+                Kembali
+            </a>
 
-    </form>
+        </form>
 
-</div>
+    </div>
 
 </body>
 
