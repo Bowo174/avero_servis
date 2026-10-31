@@ -91,9 +91,9 @@ if (!isset($_SESSION["id_user"])) {
     </div>
 
     <div class="menu">
+        <a href="pelanggan.php">👤<br><br>Pelanggan</a>
         <a href="tambah_servis.php">➕<br><br>Tambah Servis</a>
         <a href="data_servis.php">📋<br><br>Data Servis</a>
-        <a href="pelanggan.php">👤<br><br>Pelanggan</a>
         <a href="barang.php">💻<br><br>Barang</a>
         <a href="status.php">🔄<br><br>Status Servis</a>
         <a href="pengaturan.php">⚙️<br><br>Pengaturan</a>

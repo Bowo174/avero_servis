@@ -80,11 +80,11 @@ $hasil = mysqli_query($koneksi, $sql);
                     </th>
 
                     <th style="padding:12px; text-align:left;">
-                        Aksi
+                        Terdaftar
                     </th>
 
                     <th style="padding:12px; text-align:left;">
-                        Terdaftar
+                        Aksi
                     </th>
 
                 </tr>
@@ -106,6 +106,16 @@ $hasil = mysqli_query($koneksi, $sql);
                         </td>
 
                         <td style="padding:12px;">
+                            <?php
+                            echo date(
+                                "d-m-Y H:i",
+                                strtotime($row["created_at"])
+                            );
+                            ?>
+                        </td>
+
+                        
+                        <td style="padding:12px;">
 
                             <a href="edit_pelanggan.php?id=<?php echo urlencode($row["id_pelanggan"]); ?>" style="
             display:inline-block;
@@ -118,15 +128,6 @@ $hasil = mysqli_query($koneksi, $sql);
                                 ✏️ Edit
                             </a>
 
-                        </td>
-                        </td>
-                        <td style="padding:12px;">
-                            <?php
-                            echo date(
-                                "d-m-Y H:i",
-                                strtotime($row["created_at"])
-                            );
-                            ?>
                         </td>
 
                     </tr>
