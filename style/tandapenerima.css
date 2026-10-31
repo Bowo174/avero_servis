@@ -1,0 +1,90 @@
+/* Tanda terima servis Avero Komputer */
+:root {
+    --av-primary: #141414;
+    --av-primary-dark: #111111;
+    --av-accent-bg: #ed1c24;
+    --av-border: #d6d6d6;
+    --av-text: #171717;
+    --av-muted: #555555;
+    --av-table-head: #ed1c24;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    padding: 20px;
+    color: var(--av-text);
+}
+
+.nota {
+    max-width: 900px;
+    min-height: 0;
+    margin: auto;
+    background: #fff;
+    padding: 28px;
+    border: 1px solid var(--av-border);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(21, 86, 108, .08);
+}
+
+.nota-inner { display: flex; gap: 20px; align-items: stretch; min-height: 0; }
+.sidebar { width: 205px; flex: 0 0 205px; display: flex; flex-direction: column; gap: 14px; }
+.main { flex: 1 1 auto; min-width: 0; border-left: 1px solid var(--av-border); padding-left: 20px; display: flex; flex-direction: column; }
+.brand { text-align: center; }
+.brand img.logo { width: 58px; height: 58px; object-fit: contain; margin-bottom: 5px; }
+.brand h1 { margin: 0 0 6px; font-size: 20px; font-weight: 800; letter-spacing: .5px; color: var(--av-primary); line-height: 1.15; }
+.brand p { margin: 3px 0; font-size: 11px; line-height: 1.35; color: var(--av-muted); }
+.qr-box { text-align: center; padding: 12px 8px; background: var(--av-accent-bg); border: 1px solid var(--av-border); border-radius: 10px; }
+.qr-box p { margin: 0 0 6px; font-size: 11px; font-weight: bold; color: #fff; letter-spacing: .4px; }
+.qr-box img { width: 100px; height: 100px; }
+.status-box { border: 1px solid var(--av-border); border-radius: 10px; padding: 10px 11px; background: #ffffff; }
+.info-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; padding: 5px 0; border-bottom: 1px dashed var(--av-border); }
+.info-row:last-child { border-bottom: 0; }
+.info-row span.label-mini { color: var(--av-muted); }
+.info-row strong { font-size: 11px; text-align: right; }
+.badge { display: inline-block; padding: 3px 9px; border-radius: 20px; background: var(--av-primary); color: #fff; font-weight: bold; font-size: 10px; }
+.judul { margin: 0 0 18px; padding: 8px 10px; border-radius: 4px; background: var(--av-accent-bg); color: #fff; text-align: center; font-size: 24px; font-weight: 800; line-height: 1.15; }
+.content-grid { display: flex; gap: 18px; margin-bottom: 16px; }
+.data-block { flex: 1 1 0; min-width: 0; }
+.data-block h3, .rincian-box h3 { margin: 0 0 8px; font-size: 14px; font-weight: bold; color: var(--av-primary-dark); border-bottom: 2px solid var(--av-accent-bg); padding-bottom: 5px; }
+.row { font-size: 12px; margin: 5px 0; line-height: 1.4; overflow-wrap: anywhere; }
+.label { display: inline-block; width: 88px; color: var(--av-muted); vertical-align: top; }
+.separator { display: inline-block; width: 12px; margin-right: 4px; color: var(--av-text); font-weight: bold; text-align: center; vertical-align: top; }
+.row strong.val { font-weight: bold; }
+.rincian-box { margin-bottom: 14px; }
+table.rincian-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+table.rincian-table th { background: var(--av-table-head); color: #fff; font-weight: bold; text-align: left; padding: 7px 8px; border: 1px solid var(--av-border); }
+table.rincian-table th:first-child, table.rincian-table td:first-child { width: 36px; text-align: center; }
+table.rincian-table th.num, table.rincian-table td.num { text-align: right; }
+table.rincian-table td { padding: 8px; border: 1px solid var(--av-border); height: 30px; }
+table.rincian-table tfoot td { font-weight: bold; background: var(--av-accent-bg); color: #fff; }
+.syarat-box { flex: 0 0 auto; height: auto; min-height: 0; padding: 4px 7px; border: 1px solid var(--av-border); border-radius: 8px; background: #fff; margin-bottom: 4px; }
+.syarat-box h3 { margin: 0 0 3px; font-size: 13px; color: var(--av-primary-dark); }
+.syarat-text { display: block; height: auto; margin: 0; white-space: pre-line; font-size: 11px; line-height: 1.3; color: var(--av-text); }
+.footer-text { text-align: center; font-size: 11px; color: var(--av-muted); margin-top: 4px; }
+.signature-block { width: 150px; margin: 4px 0 0 auto; padding-top: 0; text-align: right; font-size: 10px; color: var(--av-text); }
+.signature-block p { margin: 0 0 62px; }
+.signature-line { width: calc(100% - 15px); border-top: 1px solid #555555; margin: 0 0 5px auto; }
+
+@media print {
+    @page { size: A4 portrait; margin: 0; }
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-area { position: relative; width: 210mm; min-height: 297mm; margin: 0; padding: 0; }
+    .nota { position: relative; width: 210mm; max-width: none; height: auto; min-height: 148.5mm; margin: 0; padding: 3mm 6mm 5mm; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+    .nota::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; border-top: 1px dashed #333; }
+    .nota-inner { height: auto; min-height: 140.5mm; gap: 5mm; }
+    .sidebar { width: 48mm; flex-basis: 48mm; gap: 4mm; }
+    .main { padding-left: 5mm; }
+    .brand p { font-size: 9pt; }
+    .brand h1 { font-size: 16pt; }
+    .content-grid { gap: 4mm; }
+    .row { font-size: 9pt; }
+    .label { width: 23mm; }
+    .separator { width: 4mm; margin-right: 1mm; }
+    .syarat-text { font-size: 8pt; }
+    .signature-block { margin-top: 4px; }
+    .rincian-table tr { page-break-inside: avoid; break-inside: avoid; }
+}
