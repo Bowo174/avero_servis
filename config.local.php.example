@@ -1,0 +1,12 @@
+<?php
+// Salin file ini menjadi config.local.php, lalu isi nilai milik hosting.
+// Jangan unggah config.local.php ke repositori publik.
+return [
+    'db_host' => 'localhost',
+    'db_user' => 'NAMA_USER_DATABASE_CPANEL',
+    'db_password' => 'GANTI_DENGAN_PASSWORD_DATABASE',
+    'db_name' => 'NAMA_DATABASE_CPANEL',
+    'app_base_url' => 'https://domain-anda.example',
+    'whatsapp_webhook_verify_token' => '',
+    'whatsapp_app_secret' => ''
+];

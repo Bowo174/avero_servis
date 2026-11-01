@@ -1,0 +1,5 @@
+Options -Indexes
+
+<FilesMatch "(?i)^(?:\.env|.*\.(?:sql|md|log|ini|bak|dist)|config\.local\.php)$">
+    Require all denied
+</FilesMatch>

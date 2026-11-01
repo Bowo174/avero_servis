@@ -1,11 +1,19 @@
 <?php
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
 
-require_once "koneksi.php";
+require_once 'koneksi.php';
 
-$nama = "Admin Avero";
-$username = "admin";
-$password = "Avero123!";
-$role = "Admin";
+$nama = trim((string) (getenv('AVERO_ADMIN_NAME') ?: 'Admin Avero'));
+$username = trim((string) getenv('AVERO_ADMIN_USER'));
+$password = (string) getenv('AVERO_ADMIN_PASSWORD');
+$role = 'Admin';
+if ($username === '' || strlen($password) < 12) {
+    fwrite(STDERR, "Set AVERO_ADMIN_USER dan AVERO_ADMIN_PASSWORD (minimal 12 karakter) sebelum menjalankan script ini.\n");
+    exit(1);
+}
 
 $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
@@ -25,15 +33,8 @@ mysqli_stmt_bind_param(
 );
 
 if (mysqli_stmt_execute($stmt)) {
-
-    echo "Akun admin berhasil dibuat.<br>";
-    echo "Username: admin<br>";
-    echo "Password: Avero123!";
-
+    echo "Akun admin berhasil dibuat.\n";
 } else {
-
-    echo "Gagal membuat akun admin: " . mysqli_error($koneksi);
-
+    fwrite(STDERR, "Akun admin gagal dibuat. Pastikan username belum digunakan.\n");
+    exit(1);
 }
-
-?>

@@ -1,5 +1,11 @@
 <?php
-
+require_once __DIR__ . '/session_bootstrap.php';
+require_once 'app_helper.php';
+requireLogin();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !verifyCsrfToken()) {
+    http_response_code(403);
+    exit('Permintaan tidak valid. Muat ulang halaman lalu coba kembali.');
+}
 require_once "koneksi.php";
 
 $id_pelanggan = $_GET["id"] ?? "";
@@ -85,80 +91,47 @@ if (isset($_POST["simpan"])) {
 
     <title>Edit Pelanggan - Avero Komputer</title>
 
+<link rel="stylesheet" href="style/edit_pelanggan.css?v=2">
+<link rel="stylesheet" href="style/responsive.css?v=3">
 </head>
 
-<body>
+<body><?php include 'navigasi.php'; ?>
 
-    <div style="
-    max-width:600px;
-    margin:40px auto;
-    padding:20px;
-    font-family:Arial,sans-serif;
-">
+    <div class="inline-cdda49f7">
 
         <h2>Edit Pelanggan</h2>
 
-        <form method="post">
+        <form method="post"><?php csrfField(); ?>
 
-            <div style="margin-bottom:15px;">
+            <div class="inline-d7858cfa">
 
                 <label>Nama</label>
 
-                <input type="text" name="nama" value="<?php echo htmlspecialchars($data["nama"]); ?>" style="
-                    width:100%;
-                    padding:10px;
-                    margin-top:5px;
-                    box-sizing:border-box;
-                ">
+                <input type="text" name="nama" value="<?php echo htmlspecialchars($data["nama"]); ?>" class="inline-33720129">
 
             </div>
 
-            <div style="margin-bottom:15px;">
+            <div class="inline-d7858cfa">
 
                 <label>No. WhatsApp</label>
 
-                <input type="text" name="no_telp" value="<?php echo htmlspecialchars($data["no_telp"]); ?>" style="
-                    width:100%;
-                    padding:10px;
-                    margin-top:5px;
-                    box-sizing:border-box;
-                ">
+                <input type="text" name="no_telp" value="<?php echo htmlspecialchars($data["no_telp"]); ?>" class="inline-33720129">
 
             </div>
 
-            <div style="margin-bottom:15px;">
+            <div class="inline-d7858cfa">
 
                 <label>Alamat</label>
 
-                <textarea name="alamat" rows="4" style="
-                    width:100%;
-                    padding:10px;
-                    margin-top:5px;
-                    box-sizing:border-box;
-                "><?php echo htmlspecialchars($data["alamat"]); ?></textarea>
+                <textarea name="alamat" rows="4" class="inline-33720129"><?php echo htmlspecialchars($data["alamat"]); ?></textarea>
 
             </div>
 
-            <button type="submit" name="simpan" style="
-                padding:10px 16px;
-                background:#16a34a;
-                color:white;
-                border:none;
-                border-radius:6px;
-                cursor:pointer;
-            ">
-                💾 Simpan Perubahan
+            <button type="submit" name="simpan" class="inline-b89c18a3">
+                ðŸ’¾ Simpan Perubahan
             </button>
 
-            <a href="pelanggan.php" style="
-                display:inline-block;
-                margin-left:8px;
-                padding:10px 16px;
-                background:#64748b;
-                color:white;
-                text-decoration:none;
-                border-radius:6px;
-            ">
+            <a href="pelanggan.php" class="inline-22443647">
                 Kembali
             </a>
 

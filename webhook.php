@@ -1,42 +1,42 @@
 <?php
+$configPath = __DIR__ . '/config.local.php';
+if (!is_file($configPath)) {
+    http_response_code(503);
+    exit('Webhook belum dikonfigurasi.');
+}
+$config = require $configPath;
+$verifyToken = (string) ($config['whatsapp_webhook_verify_token'] ?? '');
+$appSecret = (string) ($config['whatsapp_app_secret'] ?? '');
 
-// Token rahasia untuk verifikasi webhook Meta
-$verify_token = "avero_webhook_2026";
-
-// Verifikasi webhook dari Meta
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
     $mode = $_GET['hub_mode'] ?? '';
     $token = $_GET['hub_verify_token'] ?? '';
     $challenge = $_GET['hub_challenge'] ?? '';
-
-    if ($mode === 'subscribe' && $token === $verify_token) {
+    if ($verifyToken !== '' && $mode === 'subscribe' && hash_equals($verifyToken, (string) $token)) {
+        header('Content-Type: text/plain; charset=utf-8');
         echo $challenge;
         exit;
     }
-
     http_response_code(403);
-    echo "VERIFICATION_FAILED";
-    exit;
+    exit('VERIFICATION_FAILED');
 }
 
-// Menerima data webhook dari Meta
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $input = file_get_contents("php://input");
-
-    // Simpan data webhook untuk sementara agar mudah diperiksa
-    file_put_contents(
-        _DIR_ . "/webhook_log.txt",
-        date("Y-m-d H:i:s") . "\n" . $input . "\n\n",
-        FILE_APPEND
-    );
-
+    if ($appSecret === '') {
+        http_response_code(503);
+        exit('Webhook belum dikonfigurasi.');
+    }
+    $input = file_get_contents('php://input');
+    $signature = (string) ($_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '');
+    $expected = 'sha256=' . hash_hmac('sha256', $input, $appSecret);
+    if ($signature === '' || !hash_equals($expected, $signature)) {
+        http_response_code(403);
+        exit('INVALID_SIGNATURE');
+    }
     http_response_code(200);
-    echo "EVENT_RECEIVED";
-    exit;
+    exit('EVENT_RECEIVED');
 }
 
 http_response_code(405);
-echo "METHOD_NOT_ALLOWED";
-?>
+header('Allow: GET, POST');
+exit('METHOD_NOT_ALLOWED');

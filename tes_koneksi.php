@@ -1,7 +1,7 @@
 <?php
-
-require_once "koneksi.php";
-
-echo "KONEKSI DATABASE BERHASIL";
-
-?>
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
+require_once 'koneksi.php';
+echo "KONEKSI DATABASE BERHASIL\n";

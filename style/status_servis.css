@@ -1,0 +1,54 @@
+body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .header,
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 10px;
+            background: #e0f2fe;
+        }
+
+        .row {
+            margin: 10px 0;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+
+/* Converted from inline declarations for centralized responsive styling. */
+.inline-945dfac3 {margin-top:5px !important;font-size:12px !important;color:#475569 !important;}
+.inline-ad66386e {font-size:12px !important;color:#64748b !important;}
+.inline-196fc7ee {font-size:12px !important;color:#64748b !important;margin-bottom:3px !important;}
+.inline-14fe32e7 {font-weight:bold !important;font-size:16px !important;margin-bottom:4px !important;}
+.inline-9873bb35 {position:absolute !important;left:-7px !important;top:0 !important;width:10px !important;height:10px !important;background:#0ea5e9 !important;border-radius:50% !important;border:3px solid white !important;}
+.inline-b60d0ba1 {position:relative !important;margin:0 0 18px 0 !important;padding-left:25px !important;border-left:2px solid #0ea5e9 !important;}
+.inline-cbf69058 {margin-top:0 !important;margin-bottom:20px !important;}

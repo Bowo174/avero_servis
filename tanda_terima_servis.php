@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/session_bootstrap.php';
+require_once 'app_helper.php';
+requireLogin();
 require_once "koneksi.php";
 
 $nomor_servis = $_GET["nomor"] ?? "";
@@ -14,8 +17,6 @@ $sql = "SELECT
             pelanggan.no_telp,
             pelanggan.alamat,
             barang.nama_barang,
-            barang.merk,
-            barang.model,
             barang.kelengkapan
         FROM servis
         JOIN pelanggan 
@@ -30,6 +31,10 @@ mysqli_stmt_execute($stmt);
 
 $hasil = mysqli_stmt_get_result($stmt);
 $data = mysqli_fetch_assoc($hasil);
+if (!$data) {
+    http_response_code(404);
+    exit('Data servis tidak ditemukan.');
+}
 
 $rincian_servis = [];
 $total_rincian = 0;
@@ -73,13 +78,16 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanda Terima Servis</title>
-    <!-- <link rel="stylesheet" href="style/tandaTerimastyle.css?v=<?php echo filemtime(__DIR__ . '/style/tandaTerimastyle.css'); ?>"> -->
      <link rel="stylesheet" href="style/tandapenerima.css?v=<?php echo filemtime(__DIR__ . '/style/tandapenerima.css'); ?>">
+<link rel="stylesheet" href="style/tanda_terima_servis.css?v=1">
+<link rel="stylesheet" href="style/responsive.css?v=3">
 </head>
 
-<body>
+<body><?php include 'navigasi.php'; ?>
 
 <div class="print-area">
+<?php for ($salinan = 0; $salinan < 2; $salinan++) { ?>
+<section class="receipt-copy">
 <div class="nota">
 <div class="nota-inner">
 
@@ -99,7 +107,7 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
             <h1>AVERO KOMPUTER</h1>
             <p>Komputer - Printer - Service - Network - CCTV</p>
             <p><?php echo htmlspecialchars($data_toko["alamat"] ?? ""); ?></p>
-            <p>📞 <?php echo htmlspecialchars($data_toko["no_telp"] ?? ""); ?></p>
+            <p>📞<?php echo htmlspecialchars($data_toko["no_telp"] ?? ""); ?></p>
 
         </div>
 
@@ -107,7 +115,7 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
             <p>SCAN CEK STATUS</p>
 
             <?php
-            $url_status = "https://averokomputer.my.id/status_servis.php?token=" . $data["qr_token"];
+            $url_status = appUrl('status_servis.php') . '?token=' . rawurlencode($data['qr_token']);
             ?>
 
             <img
@@ -140,6 +148,7 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
     <!-- ================= KOLOM KANAN: DETAIL SERVIS ================= -->
     <div class="main">
 
+        <div class="copy-type"><?php echo $salinan === 0 ? 'UNTUK PELANGGAN' : 'ARSIP TOKO'; ?></div>
         <h2 class="judul">Tanda Terima Service</h2>
 
         <div class="content-grid">
@@ -173,18 +182,6 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
                     <span class="label">Barang</span>
                     <span class="separator">:</span>
                     <strong class="val"><?php echo htmlspecialchars($data["nama_barang"]); ?></strong>
-                </div>
-                <hr>
-                <div class="row">
-                    <span class="label">Merk</span>
-                    <span class="separator">:</span>
-                    <?php echo htmlspecialchars($data["merk"]); ?>
-                </div>
-                <hr>
-                <div class="row">
-                    <span class="label">Model/Tipe</span>
-                    <span class="separator">:</span>
-                    <?php echo htmlspecialchars($data["model"]); ?>
                 </div>
                 <hr>
                 <div class="row">
@@ -246,7 +243,7 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
         </div>
         <br>
         <br>
-        <div class="signature-block" style="text-align: right;">
+        <div class="signature-block inline-7851dbc0">
             <p>Hormat Kami</p>
             <br>
             <br>
@@ -257,6 +254,8 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
 
 </div>
 </div>
+</section>
+<?php } ?>
 </div>
 
 </body>

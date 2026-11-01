@@ -1,0 +1,4 @@
+/config.local.php
+/storage/backups/*.sql
+/storage/backups/index.json
+/storage/webhook_log.txt

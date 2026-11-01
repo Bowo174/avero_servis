@@ -1,0 +1,69 @@
+/* Shared layout and touch-friendly defaults for phones, tablets, and desktops. */
+* { box-sizing: border-box; }
+html { min-width: 320px; overflow-x: hidden; }
+body { max-width: 100%; overflow-x: hidden; }
+img, video, canvas, iframe { max-width: 100%; }
+main, section, article, .card, .wrap, .container, .grid, .bar, .filters, .tools { min-width: 0; }
+h1 { font-size: clamp(1.45rem, 4vw, 2rem); line-height: 1.2; overflow-wrap: anywhere; }
+h2 { line-height: 1.3; overflow-wrap: anywhere; }
+input, select, textarea, button { max-width: 100%; }
+button, .btn, input[type="submit"] { min-height: 42px; touch-action: manipulation; }
+textarea { resize: vertical; }
+.app-back { position: fixed; z-index: 999; top: 12px; left: 12px; padding: 10px 14px; border-radius: 10px; background: #0f172a; color: #fff; text-decoration: none; font: 600 14px Arial, sans-serif; box-shadow: 0 4px 14px #0f172a2b; }
+.pagination { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; padding: 16px 0; }
+.pagination a { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 40px; padding: 8px 12px; background: #e2e8f0; border-radius: 8px; color: #0f172a; text-decoration: none; }
+.pagination a.active { background: #0f172a; color: #fff; }
+.app-toast { width: min(100% - 32px, 1100px); margin: 70px auto 0; }
+.scroll { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { max-width: 100%; }
+.modal { overflow-y: auto; overscroll-behavior: contain; }
+.dialog { min-width: 0; }
+.photo-preview { display: inline-flex; width: 56px; height: 48px; min-height: 0; margin: 0; padding: 0; overflow: hidden; align-items: center; justify-content: center; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; cursor: zoom-in; }
+.photo-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.service-detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 16px; align-items: start; padding: 12px; border-radius: 10px; background: #f8fafc; }
+.service-photo { width: 132px; height: 104px; }
+.image-viewer { position: fixed; z-index: 2000; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: #0f172ae8; }
+.image-viewer img { display: block; max-width: min(94vw, 1200px); max-height: 88vh; object-fit: contain; border-radius: 8px; }
+.image-viewer-close { position: absolute; top: 14px; right: 14px; width: auto; min-width: 44px; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 8px; background: #fff; color: #0f172a; font-size: 16px; cursor: pointer; }
+
+@media (max-width: 800px) {
+  .wrap { width: 100%; max-width: 100%; margin: 68px auto 24px; padding-left: 14px; padding-right: 14px; }
+  .header + .wrap { margin-top: 24px; }
+  .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .card { padding: 16px; }
+  .bar, .filters, .tools { flex-wrap: wrap; }
+  .bar > *, .tools > *, .filters > * { min-width: 0; }
+  .bar input, .tools input { flex: 1 1 180px; }
+  .scroll table { min-width: 650px; }
+}
+
+@media (max-width: 520px) {
+  body { font-size: 15px; }
+  .wrap { padding-left: 10px; padding-right: 10px; }
+  .card { padding: 14px; border-radius: 12px; }
+  .app-back { top: 8px; left: 8px; padding: 9px 11px; }
+  .bar > *, .tools > *, .filters > *, .backup-row > * { width: 100%; }
+  .bar .btn, .tools .btn, .filters .btn { text-align: center; }
+  .filters label { width: 100%; }
+  .filters input, .filters select { width: 100%; }
+  .fields { grid-template-columns: minmax(0, 1fr) !important; }
+  .fields input:first-child { grid-column: auto !important; }
+  .dialog { padding: 16px; max-height: calc(100dvh - 24px); }
+  .menu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .menu a { padding: 18px 10px; overflow-wrap: anywhere; }
+  .footer { align-items: flex-start; flex-wrap: wrap; }
+  .copy { width: 100%; margin-left: 0 !important; white-space: normal; }
+  .container { width: 100%; }
+  .scroll table { min-width: 600px; }
+  .service-detail-layout { grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; padding: 10px; }
+  .service-photo { width: 96px; height: 84px; }
+}
+
+@media (max-width: 360px) {
+  .menu { grid-template-columns: 1fr; }
+  .scroll table { min-width: 560px; }
+}
+
+@media print {
+  .app-back, .pagination { display: none !important; }
+}

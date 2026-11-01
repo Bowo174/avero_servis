@@ -1,0 +1,5 @@
+body{margin:0;background:#f1f5f9;color:#172033;font:15px Arial,sans-serif}.wrap{max-width:850px;margin:70px auto 35px;padding:0 16px}.card{background:#fff;border-radius:16px;padding:22px;margin:15px 0;box-shadow:0 8px 25px #0f172a0b}h1,h2{margin-top:0}label{display:block;margin:13px 0 6px;font-weight:600}input,select,textarea,button{box-sizing:border-box;width:100%;font:inherit;padding:11px;border:1px solid #cbd5e1;border-radius:9px}textarea{min-height:85px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.btn{display:inline-block;width:auto;background:#0f766e;color:white;text-decoration:none;border:0;cursor:pointer}.notice{padding:12px;background:#dcfce7;border-radius:9px}.error{background:#fee2e2}.preview{width:150px;height:120px;object-fit:cover;border-radius:10px;display:none;margin-top:10px}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+
+/* Converted from inline declarations for centralized responsive styling. */
+.inline-4f15898a {width:auto !important;}

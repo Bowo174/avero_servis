@@ -1,143 +1,80 @@
 <?php
-
-session_start();
-
-if (!isset($_SESSION["id_user"])) {
-    header("Location: login.php");
-    exit;
-}
-
-require_once "koneksi.php";
-
-$sql = "SELECT
-            servis.nomor_servis,
-            servis.tanggal_masuk,
-            servis.status_servis,
-            pelanggan.nama,
-            barang.nama_barang,
-            barang.merk,
-            barang.model
-        FROM servis
-        JOIN pelanggan
-            ON servis.id_pelanggan = pelanggan.id_pelanggan
-        JOIN barang
-            ON servis.id_barang = barang.id_barang
-        ORDER BY servis.id_servis DESC";
-
-$hasil = mysqli_query($koneksi, $sql);
-
+require_once __DIR__ . '/session_bootstrap.php';
+require_once 'app_helper.php';
+requireLogin();
+require_once 'koneksi.php';
+$q = trim($_GET['q'] ?? '');
+$page = max(1, (int) ($_GET['page'] ?? 1));
+$limit = pageLimit();
+$offset = ($page - 1) * $limit;
+$like = '%' . $q . '%';
+$c = mysqli_prepare($koneksi, 'SELECT COUNT(*) total FROM servis s JOIN pelanggan p ON p.id_pelanggan=s.id_pelanggan JOIN barang b ON b.id_barang=s.id_barang WHERE s.status_servis LIKE ? OR p.nama LIKE ? OR b.nama_barang LIKE ? OR s.nomor_servis LIKE ?');
+mysqli_stmt_bind_param($c, 'ssss', $like, $like, $like, $like);
+mysqli_stmt_execute($c);
+$total = (int) mysqli_fetch_assoc(mysqli_stmt_get_result($c))['total'];
+$st = mysqli_prepare($koneksi, 'SELECT s.nomor_servis,s.tanggal_masuk,s.status_servis,p.nama,b.nama_barang,b.foto_barang FROM servis s JOIN pelanggan p ON p.id_pelanggan=s.id_pelanggan JOIN barang b ON b.id_barang=s.id_barang WHERE s.status_servis LIKE ? OR p.nama LIKE ? OR b.nama_barang LIKE ? OR s.nomor_servis LIKE ? ORDER BY s.id_servis DESC LIMIT ? OFFSET ?');
+mysqli_stmt_bind_param($st, 'ssssii', $like, $like, $like, $like, $limit, $offset);
+mysqli_stmt_execute($st);
+$rows = mysqli_stmt_get_result($st);
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Status Servis - Avero Komputer</title>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Status Servis</title>
+    <link rel="stylesheet" href="style/status.css?v=2">
+    <link rel="stylesheet" href="style/responsive.css?v=3">
 </head>
 
-<body>
-
-<h1>🔧 Status Servis</h1>
-
-<div style="overflow-x:auto;">
-
-    <table style="width:100%; border-collapse:collapse; min-width:800px;">
-
-        <tr style="background:#f8fafc;">
-
-            <th style="padding:12px; text-align:left;">
-                No. Servis
-            </th>
-
-            <th style="padding:12px; text-align:left;">
-                Pelanggan
-            </th>
-
-            <th style="padding:12px; text-align:left;">
-                Barang
-            </th>
-
-            <th style="padding:12px; text-align:left;">
-                Status
-            </th>
-
-            <th style="padding:12px; text-align:left;">
-                Tanggal
-            </th>
-
-        </tr>
-
-        <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
-
-            <tr style="border-top:1px solid #e2e8f0;">
-
-                <td style="padding:12px;">
-                    <?php echo htmlspecialchars($row["nomor_servis"]); ?>
-                </td>
-
-                <td style="padding:12px;">
-                    <?php echo htmlspecialchars($row["nama"]); ?>
-                </td>
-
-                <td style="padding:12px;">
-                    <?php echo htmlspecialchars($row["nama_barang"]); ?>
-                    <?php echo " " . htmlspecialchars($row["merk"]); ?>
-                    <?php echo " " . htmlspecialchars($row["model"]); ?>
-                </td>
-
-                <td style="padding:12px;">
-
-    <?php
-    $status = $row["status_servis"];
-
-    $warna = "#64748b";
-
-    if ($status == "Diterima") {
-        $warna = "#f59e0b";
-    } elseif ($status == "Pemeriksaan") {
-        $warna = "#3b82f6";
-    } elseif ($status == "Menunggu Persetujuan") {
-        $warna = "#f97316";
-    } elseif ($status == "Menunggu Sparepart") {
-        $warna = "#8b5cf6";
-    } elseif ($status == "Dalam Pengerjaan") {
-        $warna = "#0ea5e9";
-    } elseif ($status == "Selesai") {
-        $warna = "#22c55e";
-    } elseif ($status == "Sudah Diambil") {
-        $warna = "#475569";
-    }
-    ?>
-
-    <span style="
-        display:inline-block;
-        padding:6px 12px;
-        border-radius:20px;
-        background:<?php echo $warna; ?>;
-        color:white;
-        font-weight:bold;
-        font-size:13px;
-    ">
-        <?php echo htmlspecialchars($status); ?>
-    </span>
-
-</td>
-                <td style="padding:12px;">
-                    <?php echo date("d-m-Y H:i", strtotime($row["tanggal_masuk"])); ?>
-                </td>
-
-            </tr>
-
-        <?php } ?>
-
-    </table>
-
-</div>
+<body><?php include 'navigasi.php'; ?>
+    <main class="wrap">
+        <h1>Status Servis</h1>
+        <section class="card">
+            <form><input name="q" value="<?php echo h($q); ?>"
+                    placeholder="Cari status, pelanggan, barang, nomor"><button>Cari</button></form>
+            <div class="scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No. Servis</th>
+                            <th>Pelanggan</th>
+                            <th>Barang</th>
+                            <th>Foto</th>
+                            <th>Status</th>
+                            <th>Tanggal masuk</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody><?php while ($r = mysqli_fetch_assoc($rows)): ?>
+                            <tr>
+                                <td><?php echo h($r['nomor_servis']); ?></td>
+                                <td><?php echo h($r['nama']); ?></td>
+                                <td><?php echo h($r['nama_barang']); ?></td>
+                                <td><?php if (!empty($r['foto_barang'])):
+                                    $foto = 'uploads/barang/' . rawurlencode($r['foto_barang']); ?><button
+                                            type="button" class="photo-preview" data-preview-src="<?php echo h($foto); ?>"
+                                            data-preview-alt="Foto <?php echo h($r['nama_barang']); ?>"
+                                            aria-label="Lihat foto <?php echo h($r['nama_barang']); ?>"><img
+                                                src="<?php echo h($foto); ?>"
+                                                alt="Foto <?php echo h($r['nama_barang']); ?>"></button><?php else: ?>&mdash;<?php endif; ?>
+                                </td>
+                                <td><?php echo h($r['status_servis']); ?></td>
+                                <td><?php echo h(date('d-m-Y H:i', strtotime($r['tanggal_masuk']))); ?></td>
+                                <td><a class="btn"
+                                        href="ubah_status.php?nomor=<?php echo urlencode($r['nomor_servis']); ?>">Ubah</a>
+                                </td>
+                            </tr><?php endwhile; ?><?php if (!$total): ?>
+                            <tr>
+                                <td colspan="7">Data tidak ditemukan.</td>
+                            </tr><?php endif; ?>
+                    </tbody>
+                </table>
+            </div><?php renderPagination($total, $page, ['q' => $q]); ?>
+        </section>
+    </main>
+    <script src="js/image-preview.js" defer></script>
 </body>
 
 </html>

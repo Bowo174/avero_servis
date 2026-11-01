@@ -1,6 +1,11 @@
 <?php
 
-session_start();
+require_once __DIR__ . '/session_bootstrap.php';
+require_once 'app_helper.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !verifyCsrfToken()) {
+    http_response_code(403);
+    exit('Permintaan tidak valid. Muat ulang halaman lalu coba kembali.');
+}
 require_once "koneksi.php";
 
 $pesan = "";
@@ -27,6 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user["aktif"] == 1 &&
         password_verify($password, $user["password"])
     ) {
+
+        session_regenerate_id(true);
 
         $_SESSION["id_user"] = $user["id_user"];
         $_SESSION["nama"] = $user["nama"];
@@ -56,76 +63,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <title>Login - Avero Komputer</title>
 
-    <style>
+    <link rel="stylesheet" href="style/login.css?v=2">
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 60px auto;
-        }
-
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            margin-top: 25px;
-            padding: 13px;
-            border: none;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-    </style>
-
+<link rel="stylesheet" href="style/responsive.css?v=3">
 </head>
 
 <body>
@@ -149,6 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
 
         <form method="POST">
+            <?php csrfField(); ?>
 
             <label>Username</label>
 

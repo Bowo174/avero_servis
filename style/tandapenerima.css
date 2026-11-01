@@ -29,6 +29,10 @@ body {
     box-shadow: 0 2px 10px rgba(21, 86, 108, .08);
 }
 
+.receipt-copy { width: 100%; max-width: 900px; margin: 0 auto 18px; padding-bottom: 12px; border-bottom: 1px dashed #555; }
+.receipt-copy:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.copy-type { margin: 0 0 5px; color: #555; text-align: right; font-size: 10px; font-weight: 700; letter-spacing: .4px; }
+
 .nota-inner { display: flex; gap: 20px; align-items: stretch; min-height: 0; }
 .sidebar { width: 205px; flex: 0 0 205px; display: flex; flex-direction: column; gap: 14px; }
 .main { flex: 1 1 auto; min-width: 0; border-left: 1px solid var(--av-border); padding-left: 20px; display: flex; flex-direction: column; }
@@ -72,10 +76,13 @@ table.rincian-table tfoot td { font-weight: bold; background: var(--av-accent-bg
     @page { size: A4 portrait; margin: 0; }
     html, body { margin: 0; padding: 0; background: #fff; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-area { position: relative; width: 210mm; min-height: 297mm; margin: 0; padding: 0; }
-    .nota { position: relative; width: 210mm; max-width: none; height: auto; min-height: 148.5mm; margin: 0; padding: 3mm 6mm 5mm; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
-    .nota::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; border-top: 1px dashed #333; }
-    .nota-inner { height: auto; min-height: 140.5mm; gap: 5mm; }
+    .print-area { position: relative; width: 210mm; height: 297mm; margin: 0; padding: 0; overflow: hidden; }
+    .receipt-copy { position: relative; width: 210mm; height: 148.5mm; max-width: none; margin: 0; padding: 0; border: 0; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .receipt-copy:first-child { border-bottom: .25mm dashed #333; }
+    .receipt-copy:first-child::after { content: "✂ GUNTING DI SINI"; position: absolute; z-index: 2; right: 7mm; bottom: 0; padding: 0 2mm; background: #fff; color: #333; font-size: 7pt; }
+    .nota { position: relative; width: 210mm; max-width: none; height: 148.5mm; min-height: 148.5mm; margin: 0; padding: 3mm 6mm 5mm; border: 0; border-radius: 0; box-shadow: none; overflow: hidden; }
+    .nota-inner { height: 140.5mm; min-height: 140.5mm; gap: 5mm; }
+    .copy-type { margin: 0 0 2mm; font-size: 7pt; }
     .sidebar { width: 48mm; flex-basis: 48mm; gap: 4mm; }
     .main { padding-left: 5mm; }
     .brand p { font-size: 9pt; }
@@ -87,4 +94,16 @@ table.rincian-table tfoot td { font-weight: bold; background: var(--av-accent-bg
     .syarat-text { font-size: 8pt; }
     .signature-block { margin-top: 4px; }
     .rincian-table tr { page-break-inside: avoid; break-inside: avoid; }
+}
+
+@media screen and (max-width: 700px) {
+    body { padding: 12px; }
+    .print-area, .receipt-copy, .nota { width: 100%; max-width: 100%; }
+    .nota { padding: 16px; }
+    .nota-inner { flex-direction: column; gap: 14px; }
+    .sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; flex-basis: auto; gap: 10px; }
+    .brand { grid-column: 1 / -1; }
+    .main { border-left: 0; border-top: 1px solid var(--av-border); padding: 14px 0 0; }
+    .content-grid { flex-direction: column; gap: 8px; }
+    .copy-type { margin-bottom: 8px; }
 }

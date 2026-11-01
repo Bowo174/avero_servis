@@ -1,107 +1,53 @@
 <?php
-require_once "koneksi.php";
-?>
-
-<?php
-
-session_start();
-
-if (!isset($_SESSION["id_user"])) {
-    header("Location: login.php");
+require_once __DIR__ . '/session_bootstrap.php';
+if (empty($_SESSION['id_user'])) {
+    header('Location: login.php');
     exit;
 }
-
+require_once 'koneksi.php';
+require_once 'app_helper.php';
+$st = mysqli_query($koneksi, 'SELECT nama_toko,alamat,no_telp,logo FROM pengaturan_toko ORDER BY id_pengaturan DESC LIMIT 1');
+$toko = mysqli_fetch_assoc($st) ?: [];
 ?>
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avero Komputer - Dashboard</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-        }
-
-        .header {
-            background: #1f2937;
-            color: white;
-            padding: 20px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .header p {
-            margin: 5px 0 0;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        .welcome {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-        }
-
-        .menu a {
-            background: white;
-            padding: 25px 15px;
-            text-align: center;
-            text-decoration: none;
-            color: #1f2937;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            font-weight: bold;
-        }
-
-        .menu a:hover {
-            background: #e5e7eb;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#0f766e">
+    <title>Avero Service</title>
+    <link rel="stylesheet" href="style/index.css?v=3">
+<link rel="stylesheet" href="style/responsive.css?v=3">
+    <script src="js/typewriter.js" defer></script>
 </head>
 
-<body>
-
-<div class="header">
-    <h1>Avero Komputer</h1>
-    <p>Komputer - Printer - Service - Network - CCTV</p>
-</div>
-
-<div class="container">
-
-    <div class="welcome">
-        <h2>Dashboard</h2>
-        <p>Selamat datang di Sistem Servis Avero Komputer.</p>
-    </div>
-
-    <div class="menu">
-        <a href="pelanggan.php">👤<br><br>Pelanggan</a>
-        <a href="tambah_servis.php">➕<br><br>Tambah Servis</a>
-        <a href="data_servis.php">📋<br><br>Data Servis</a>
-        <a href="barang.php">💻<br><br>Barang</a>
-        <a href="status.php">🔄<br><br>Status Servis</a>
-        <a href="pengaturan.php">⚙️<br><br>Pengaturan</a>
-        <a href="transaksi.php">💰<br><br>Transaksi</a>
-        <a href="laporan.php">�<br><br>Laporan</a>
-    </div>
-
-</div>
-
+<body><?php include 'navigasi.php'; ?>
+    <header class="header">
+        <h1>Avero Service</h1>
+        <p>Manajemen servis, transaksi, dan laporan Avero Komputer</p>
+    </header>
+    <main class="wrap">
+        <section class="welcome">
+            <h2 class="typewriter" id="welcome-title" data-text="Selamat datang, Admin Avero">Selamat datang, Admin Avero</h2>
+            <p>Pilih menu untuk melanjutkan pekerjaan.</p>
+        </section>
+        <nav class="menu"><a href="pelanggan.php"><span class="icon">👥</span>Master Pelanggan</a><a
+                href="tambah_servis.php"><span class="icon">➕</span>Tambah Servis</a><a href="data_servis.php"><span
+                    class="icon">📋</span>Data Servis</a><a href="barang.php"><span
+                    class="icon">📦</span>Barang</a><a href="status.php"><span class="icon">🔄</span>Status
+                Servis</a><a href="transaksi.php"><span class="icon">💰</span>Transaksi / Kasir</a><a
+                    href="laporan.php"><span class="icon">📊</span>Laporan</a><a href="ubah_password.php"><span class="icon">🔐</span>Ganti Password</a><a href="pengaturan.php"><span
+                    class="icon">⚙️</span>Pengaturan Toko</a><a href="logout.php"><span
+                    class="icon">🚪</span>Keluar</a></nav>
+        <footer class="footer"><?php if (!empty($toko['logo'])): ?><img
+                    src="uploads/logo/<?php echo rawurlencode($toko['logo']); ?>" alt="Logo toko"><?php endif; ?>
+            <div><strong><?php echo h($toko['nama_toko'] ?? 'Avero Komputer'); ?></strong>
+                <p><?php echo nl2br(h($toko['alamat'] ?? '')); ?></p>
+                <p>Kontak: <?php echo h($toko['no_telp'] ?? ''); ?></p>
+            </div><small class="copy">© <?php echo date('Y'); ?> Avero Komputer</small>
+        </footer>
+    </main>
 </body>
+
 </html>

@@ -1,205 +1,76 @@
 <?php
-
-session_start();
-
-if (!isset($_SESSION["id_user"])) {
-    header("Location: login.php");
-    exit;
-}
-
-require_once "koneksi.php";
-
-$sql = "    SELECT
-                servis.id_servis,
-                servis.nomor_servis,
-                servis.tanggal_masuk,
-                servis.status_servis,
-                pelanggan.nama,
-                pelanggan.no_telp,
-                barang.nama_barang,
-                barang.merk,
-                barang.model
-            FROM servis
-            JOIN pelanggan
-            ON servis.id_pelanggan = pelanggan.id_pelanggan 
-            JOIN barang
-            ON servis.id_barang = barang.id_barang
-            ORDER BY servis.id_servis DESC
-        ";
-
-$hasil = mysqli_query($koneksi, $sql);
-
+require_once __DIR__ . '/session_bootstrap.php';
+require_once 'app_helper.php';
+requireLogin();
+require_once 'koneksi.php';
+$q = trim($_GET['q'] ?? '');
+$page = max(1, (int) ($_GET['page'] ?? 1));
+$limit = pageLimit();
+$offset = ($page - 1) * $limit;
+$like = '%' . $q . '%';
+$c = mysqli_prepare($koneksi, 'SELECT COUNT(*) total FROM servis s JOIN pelanggan p ON p.id_pelanggan=s.id_pelanggan JOIN barang b ON b.id_barang=s.id_barang WHERE s.nomor_servis LIKE ? OR p.nama LIKE ? OR b.nama_barang LIKE ? OR s.status_servis LIKE ?');
+mysqli_stmt_bind_param($c, 'ssss', $like, $like, $like, $like);
+mysqli_stmt_execute($c);
+$total = (int) mysqli_fetch_assoc(mysqli_stmt_get_result($c))['total'];
+$st = mysqli_prepare($koneksi, 'SELECT s.id_servis,s.nomor_servis,s.tanggal_masuk,s.status_servis,s.qr_token,p.nama,p.no_telp,b.nama_barang FROM servis s JOIN pelanggan p ON p.id_pelanggan=s.id_pelanggan JOIN barang b ON b.id_barang=s.id_barang WHERE s.nomor_servis LIKE ? OR p.nama LIKE ? OR b.nama_barang LIKE ? OR s.status_servis LIKE ? ORDER BY s.id_servis DESC LIMIT ? OFFSET ?');
+mysqli_stmt_bind_param($st, 'ssssii', $like, $like, $like, $like, $limit, $offset);
+mysqli_stmt_execute($st);
+$rows = mysqli_stmt_get_result($st);
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Data Servis - Avero Komputer</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        h1 {
-            color: #0f172a;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Data Servis</title>
+    <link rel="stylesheet" href="style/data_servis.css?v=2">
+    <link rel="stylesheet" href="style/responsive.css?v=3">
 </head>
 
-<body>
-
-    <div class="container">
-
-        <h1>📋 Data Servis</h1>
-
-        <div class="card" style="overflow-x:auto;">
-
-            <table style="width:100%; border-collapse:collapse; min-width:800px;">
-
-                <tr style="background:#f8fafc;">
-                    <th style="padding:12px; text-align:left;">No. Servis</th>
-                    <th style="padding:12px; text-align:left;">Pelanggan</th>
-                    <th style="padding:12px; text-align:left;">Barang</th>
-                    <th style="padding:12px; text-align:left;">Status</th>
-                    <th style="padding:12px; text-align:left;">Tanggal Masuk</th>
-                    <th style="padding:12px; text-align:left;">Aksi</th>
-                </tr>
-
-                <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
-
-                    <tr style="border-top:1px solid #e2e8f0;">
-
-                        <td style="padding:12px;">
-                            <?php echo htmlspecialchars($row["nomor_servis"]); ?>
-                        </td>
-
-                        <td style="padding:12px;">
-                            <?php echo htmlspecialchars($row["nama"]); ?>
-                        </td>
-
-                        <td style="padding:12px;">
-                            <?php
-                            echo htmlspecialchars(
-                                $row["nama_barang"] . " " .
-                                    $row["merk"] . " " .
-                                    $row["model"]
-                            );
-                            ?>
-                        </td>
-
-                        <td style="padding:12px;">
-                            <?php echo htmlspecialchars($row["status_servis"]); ?>
-                        </td>
-
-                        <td style="padding:12px;">
-                            <?php
-                            echo date(
-                                "d-m-Y H:i",
-                                strtotime($row["tanggal_masuk"])
-                            );
-                            ?>
-                        </td>
-                        <td style="padding:12px; display:flex; gap:8px; align-items:center; flex-wrap:nowrap;">
-                            
-   <?php
-echo "<!-- STATUS: [" . $row["status_servis"] . "] -->";
-if ($row["status_servis"] == "Diterima") {
-    $pesan_status = "Barang sudah kami terima dan akan segera kami proses untuk pemeriksaan. Mohon menunggu update selanjutnya.";
-} elseif ($row["status_servis"] == "Pemeriksaan") {
-    $pesan_status = "Barang sedang dalam proses pemeriksaan oleh teknisi kami. Mohon menunggu informasi mengenai hasil pemeriksaan selanjutnya.";
-} elseif ($row["status_servis"] == "Menunggu Persetujuan") {
-    $pesan_status = "Hasil pengecekan barang telah selesai. Berdasarkan hasil pengecekan, diperlukan tindakan servis lebih lanjut. Saat ini kami menunggu persetujuan sebelum proses pengerjaan dilanjutkan.";
-} elseif ($row["status_servis"] == "Menunggu Sparepart") {
-    $pesan_status = "Sparepart yang diperlukan untuk proses servis sedang kami persiapkan. Setelah sparepart tersedia, proses pengerjaan akan segera kami lanjutkan. Mohon menunggu update selanjutnya dari kami.";
-} elseif ($row["status_servis"] == "Sparepart Telah Tiba") {
-    $pesan_status = "Sparepart yang diperlukan untuk proses servis telah tiba. Dimohon untuk segera membawa perangkat atau device anda ke toko, supaya proses pengerjaan segera kami lanjutkan.";
-}  elseif ($row["status_servis"] == "Dalam Pengerjaan") {
-    $pesan_status = "Barang saat ini sedang dalam proses pengerjaan oleh teknisi Avero Komputer sesuai hasil pemeriksaan dan persetujuan yang telah diberikan. Mohon menunggu update selanjutnya dari kami.";
-} elseif ($row["status_servis"] == "Selesai") {
-    $pesan_status = "Servis barang telah selesai dan sudah dapat diambil. Silakan datang ke Avero Komputer untuk melakukan pengambilan barang. Jangan lupa membawa tanda terima servis sebagai bukti pengambilan.";
-} elseif ($row["status_servis"] == "Sudah Diambil") {
-    $pesan_status = "Servis barang telah selesai dan barang sudah diambil oleh pelanggan. Terima kasih telah mempercayakan kebutuhan servis kepada Avero Komputer.";
-} else {
-    $pesan_status = "Mohon menunggu informasi dan update proses servis selanjutnya dari kami.";
-}
-$pesan_whatsapp =
-    "Assalamu'alaikum Wr. Wb. " .
-    "\xF0\x9F\x98\x8A\n\n" .
-    "Kami dari Avero Komputer ingin menginformasikan:\n\n" .
-    "Nama       : " . $row["nama"] . "\n" .
-    "No. Servis : " . $row["nomor_servis"] . "\n" .
-    "Barang     : " . $row["nama_barang"] . " " . $row["merk"] . " " . $row["model"] . "\n" .
-    "Status     : " . $row["status_servis"] . "\n\n" .
-    $pesan_status . "\n\n" .
-    "Terima kasih atas kesabaran dan kepercayaannya kepada Avero Komputer. " .
-    "\xF0\x9F\x99\x8F";
-    ?>
-                            <a
-                                href="https://web.whatsapp.com/send?phone=+62<?php echo ltrim(preg_replace('/[^0-9]/', '', $row["no_telp"]), '0'); ?>&text=<?php echo urlencode($pesan_whatsapp); ?>"
-                                target="_blank"
-                                style="
-                                    display:inline-block;
-                                    padding:5px 7px;
-                                    background:#25D366;
-                                    color:white;
-                                    text-decoration:none;
-                                    border-radius:6px;
-                                    white-space:nowrap;
-                                "> 💬 WhatsApp
-                            </a>
-
-                            <a
-                                href="tanda_terima_servis.php?nomor=<?php echo urlencode($row["nomor_servis"]); ?>"
-                                style="
-                                    display:inline-block;
-                                    padding:5px 7px;
-                                    background:#0ea5e9;     
-                                    color:white;
-                                    text-decoration:none;
-                                    border-radius:6px;
-                                    white-space:nowrap;
-                                "> 👁️ Lihat
-                            </a>
-
-                            <a
-                                href="ubah_status.php?nomor=<?php echo urlencode($row["nomor_servis"]); ?>"
-                                style="
-                                    display:inline-block;
-                                    padding:5px 7px;
-                                    background:#16a34a;
-                                    color:white;
-                                    text-decoration:none;
-                                    border-radius:6px;
-                                    white-space:nowrap;
-                                "> 🔧 Status
-                            </a>
-                        </td>
-                    </tr>
-
-                <?php } ?>
-
-            </table>
-        </div>
-    </div>
+<body><?php include 'navigasi.php'; ?>
+    <main class="wrap">
+        <h1>Data Servis</h1>
+        <section class="card">
+            <form class="bar"><input name="q" value="<?php echo h($q); ?>"
+                    placeholder="Cari nomor, pelanggan, barang, status"><button class="btn">Cari</button><a
+                    class="btn gray" href="tambah_servis.php">+ Servis baru</a></form>
+            <div class="scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No. Servis</th>
+                            <th>Pelanggan</th>
+                            <th>Barang</th>
+                            <th>Status</th>
+                            <th>Tanggal masuk</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($r = mysqli_fetch_assoc($rows)):
+                            $pesan = buildServiceStatusMessage($r['nama'], $r['nomor_servis'], $r['nama_barang'], $r['status_servis']);
+                            $wa = 'https://wa.me/62' . ltrim(preg_replace('/\D/', '', $r['no_telp']), '0') . '?text=' . rawurlencode($pesan); ?>
+                            <tr>
+                                <td><?php echo h($r['nomor_servis']); ?></td>
+                                <td><?php echo h($r['nama']); ?><br><small><?php echo h($r['no_telp']); ?></small></td>
+                                <td><?php echo h($r['nama_barang']); ?></td>
+                                <td><?php echo h($r['status_servis']); ?></td>
+                                <td><?php echo h(date('d-m-Y H:i', strtotime($r['tanggal_masuk']))); ?></td>
+                                <td>
+                                    <a class="btn action-btn" title="Ubah status servis" aria-label="Ubah status servis" data-tooltip="Ubah status" href="ubah_status.php?nomor=<?php echo urlencode($r['nomor_servis']); ?>">✏️</a>
+                                    <a class="btn blue action-btn" title="Buka transaksi servis" aria-label="Buka transaksi servis" data-tooltip="Transaksi" href="transaksi.php?id=<?php echo (int) $r['id_servis']; ?>">💰</a>
+                                    <a class="btn action-btn" title="Kirim WhatsApp kepada pelanggan" aria-label="Kirim WhatsApp kepada pelanggan" data-tooltip="Kirim WhatsApp" target="_blank" rel="noopener" href="<?php echo h($wa); ?>">💬</a>
+                                </td>
+                            </tr><?php endwhile; ?><?php if (!$total): ?>
+                            <tr>
+                                <td colspan="6">Data servis belum ditemukan.</td>
+                            </tr><?php endif; ?>
+                    </tbody>
+                </table>
+            </div><?php renderPagination($total, $page, ['q' => $q]); ?>
+        </section>
+    </main>
 </body>
 
 </html>
