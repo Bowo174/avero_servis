@@ -1,10 +1,14 @@
 <?php
+require_once __DIR__ . '/app_helper.php';
 require_once "koneksi.php";
 
 $token = $_GET["token"] ?? "";
 
 $data = null;
 $riwayat = [];
+$riwayatTotal = 0;
+$riwayatPage = max(1, (int) ($_GET['page'] ?? 1));
+$riwayatLimit = pageLimit();
 
 if ($token != "") {
     $sql = "SELECT
@@ -48,6 +52,11 @@ if ($token != "") {
 
         if ($id_servis) {
 
+            $stmt_count = mysqli_prepare($koneksi, 'SELECT COUNT(*) total FROM riwayat_status WHERE id_servis=?');
+            mysqli_stmt_bind_param($stmt_count, 'i', $id_servis);
+            mysqli_stmt_execute($stmt_count);
+            $riwayatTotal = (int) (mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count))['total'] ?? 0);
+            $riwayatOffset = ($riwayatPage - 1) * $riwayatLimit;
             $sql_riwayat = "SELECT
                     riwayat_status.status,
                     riwayat_status.catatan,
@@ -57,10 +66,10 @@ if ($token != "") {
                 LEFT JOIN users
                     ON riwayat_status.id_user = users.id_user
                 WHERE riwayat_status.id_servis = ?
-                ORDER BY riwayat_status.created_at ASC";
+                ORDER BY riwayat_status.created_at ASC LIMIT ? OFFSET ?";
 
             $stmt_riwayat = mysqli_prepare($koneksi, $sql_riwayat);
-            mysqli_stmt_bind_param($stmt_riwayat, "i", $id_servis);
+            mysqli_stmt_bind_param($stmt_riwayat, "iii", $id_servis, $riwayatLimit, $riwayatOffset);
             mysqli_stmt_execute($stmt_riwayat);
 
             $hasil_riwayat = mysqli_stmt_get_result($stmt_riwayat);
@@ -188,6 +197,8 @@ if ($token != "") {
                     <p>Belum ada riwayat servis.</p>
 
                 <?php } ?>
+
+                <?php renderPagination($riwayatTotal, $riwayatPage, ['token' => $token]); ?>
 
             </div>
 

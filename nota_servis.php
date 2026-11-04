@@ -89,19 +89,18 @@ $data_toko = mysqli_fetch_assoc($hasil_toko);
         <div class="nota">
             <div class="nota-inner">
                 <header class="shop-header">
+                    <div class="shop-brand">
                     <?php if (!empty($data_toko["logo"])) { ?>
-                        <img class="shop-logo" src="uploads/logo/<?php echo htmlspecialchars($data_toko["logo"]); ?>"
+                        <img class="shop-logo" src="uploads/logo/<?php echo rawurlencode($data_toko["logo"]); ?>"
                             alt="Logo Avero Komputer">
-                    <?php } else { ?>
-                        <span class="logo-placeholder"></span>
                     <?php } ?>
-                    <div class="shop-info">
-                        <h1>AVERO KOMPUTER</h1>
-                        <p>Komputer - Printer - Service - Network - CCTV</p>
-                        <p><?php echo htmlspecialchars($data_toko["alamat"] ?? ""); ?></p>
-                        <p>No. Telp <?php echo htmlspecialchars($data_toko["no_telp"] ?? ""); ?></p>
+                        <div class="shop-info">
+                            <h1>AVERO KOMPUTER</h1>
+                            <p>Komputer - Printer - Service - Network - CCTV</p>
+                            <p><?php echo htmlspecialchars($data_toko["alamat"] ?? ""); ?></p>
+                            <p>No. Telp <?php echo htmlspecialchars($data_toko["no_telp"] ?? ""); ?></p>
+                        </div>
                     </div>
-                    <span class="header-spacer"></span>
                 </header>
 
                 <div class="service-meta">

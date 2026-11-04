@@ -89,26 +89,26 @@ table.rincian-table tfoot td { font-weight: bold; background: var(--av-accent-bg
     .rincian-table tr { page-break-inside: avoid; break-inside: avoid; }
 }
 
-/* Nota servis: kop toko merah dan isi dua kolom */
+/* Nota servis: kop toko bersih dengan aksen garis merah */
 .nota { padding: 28px; }
 .nota-inner { display: block; min-height: 0; height: auto; }
 .shop-header {
-    display: grid;
-    grid-template-columns: 72px minmax(0, 1fr) 72px;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
     min-height: 100px;
     margin: -28px -28px 12px;
     padding: 10px 18px;
-    background: #ed1c24;
-    color: #fff;
+    background: #fff;
+    color: #171717;
     text-align: center;
+    border-bottom: 2px solid #ed1c24;
 }
-.shop-info { align-self: stretch; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-.shop-logo { display: block; width: 64px; height: 64px; object-fit: contain; }
-.logo-placeholder { width: 64px; height: 64px; }
-.shop-info h1 { position: relative; top: 3px; margin: 0 0 4px; color: #fff; font-size: 25px; line-height: 1.1; }
-.shop-info p { margin: 2px 0; color: #fff; font-size: 11px; line-height: 1.25; }
+.shop-brand { display: flex; justify-content: center; align-items: center; gap: 12px; max-width: 100%; }
+.shop-info { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.shop-logo { display: block; flex: 0 0 auto; width: 64px; height: 64px; object-fit: contain; }
+.shop-info h1 { margin: 0 0 5px; color: #171717; font-size: 25px; line-height: 1.1; }
+.shop-info p { margin: 2px 0; color: #171717; font-size: 11px; line-height: 1.25; }
 .service-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px 16px; margin: 0 0 10px; padding: 5px 0; border-bottom: 1px solid #d6d6d6; font-size: 10px; }
 .service-meta > div { display: flex; gap: 5px; }
 .status-label { color: #b5121b; font-weight: bold; }
@@ -138,8 +138,9 @@ table.rincian-table tfoot td { padding: 5px 6px; background: #ed1c24; color: #ff
 @media print {
     .nota { width: 210mm; min-height: 148.5mm; height: auto; padding: 3mm 6mm 5mm; }
     .nota-inner { min-height: 140.5mm; height: auto; }
-    .shop-header { min-height: 26mm; margin: -3mm -6mm 3mm; padding: 2.5mm 6mm; grid-template-columns: 18mm minmax(0, 1fr) 18mm; gap: 2mm; }
-    .shop-logo, .logo-placeholder { width: 16mm; height: 16mm; }
+    .shop-header { min-height: 26mm; margin: -3mm -6mm 3mm; padding: 2.5mm 6mm; border-bottom-width: .5mm; }
+    .shop-brand { gap: 3mm; }
+    .shop-logo { width: 16mm; height: 16mm; }
     .shop-info h1 { font-size: 19pt; }
     .shop-info p { font-size: 8pt; }
     .service-meta { margin-bottom: 2mm; padding: 1mm 0; font-size: 7.5pt; }
