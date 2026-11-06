@@ -118,10 +118,14 @@ $rows = mysqli_stmt_get_result($list);
         <?php if ($service): ?>
             <section class="card">
                 <h2>Input rincian biaya</h2>
-                <div class="service-meta"><b><?php echo h($service['nomor_servis']); ?></b> Â·
-                    <?php echo h($service['nama']); ?> Â·
-                    <?php echo h($service['no_telp']); ?><br><?php echo h($service['nama_barang']); ?> Â· Status:
-                    <?php echo h($service['status_servis']); ?><br>Keluhan: <?php echo h($service['keluhan']); ?></div>
+                <div class="service-meta">
+                    <b><?php echo h($service['nomor_servis']); ?></b> <br>
+                    <?php echo h($service['nama']); ?> <br>
+                    <?php echo h($service['no_telp']); ?><br>
+                    <?php echo h($service['nama_barang']); ?><br> Status:
+                    <?php echo h($service['status_servis']); ?><br>Keluhan:
+                    <?php echo h($service['keluhan']); ?>
+                </div>
                 <form method="post" id="transaksi-form"><?php csrfField(); ?>
                     <input type="hidden" name="id_servis" value="<?php echo (int) $service['id_servis']; ?>">
                     <div id="detail-list">
@@ -205,7 +209,8 @@ $rows = mysqli_stmt_get_result($list);
             <p>Pilih nama pelanggan dan barang yang akan dibuat transaksinya.</p>
             <label for="cari-servis-transaksi">Cari nama pelanggan, barang, atau nomor servis</label>
             <div class="customer-search">
-                <input type="search" id="cari-servis-transaksi" autocomplete="off" placeholder="Ketik minimal 2 karakter...">
+                <input type="search" id="cari-servis-transaksi" autocomplete="off"
+                    placeholder="Ketik minimal 2 karakter...">
                 <div id="hasil-servis-transaksi" class="customer-results" role="listbox" hidden></div>
             </div>
         </div>
@@ -233,7 +238,7 @@ $rows = mysqli_stmt_get_result($list);
                     hasilServisTransaksi.hidden = false;
                 } catch (error) { if (error.name !== 'AbortError') hasilServisTransaksi.hidden = true; }
             }, 250);
-        });        const modal = document.getElementById('modal'); document.getElementById('open-modal').onclick = () => modal.classList.add('open'); document.getElementById('close-modal').onclick = () => modal.classList.remove('open'); modal.addEventListener('click', event => { if (event.target === modal) modal.classList.remove('open') });
+        }); const modal = document.getElementById('modal'); document.getElementById('open-modal').onclick = () => modal.classList.add('open'); document.getElementById('close-modal').onclick = () => modal.classList.remove('open'); modal.addEventListener('click', event => { if (event.target === modal) modal.classList.remove('open') });
         const list = document.getElementById('detail-list'); function updateTotal() { const sum = document.getElementById('sum'); if (!list || !sum) return; let value = 0; list.querySelectorAll('.fields').forEach(row => value += (Number(row.querySelector('[name="jumlah[]"]').value) || 0) * (Number(row.querySelector('[name="harga_satuan[]"]').value) || 0)); sum.textContent = new Intl.NumberFormat('id-ID').format(value) }
         if (list) { list.addEventListener('input', updateTotal); list.addEventListener('click', event => { if (event.target.classList.contains('remove') && list.children.length > 1) { event.target.parentElement.remove(); updateTotal() } }); document.getElementById('add-row').onclick = () => { const row = document.createElement('div'); row.className = 'fields'; row.innerHTML = '<input name="keterangan[]" required maxlength="255" placeholder="Keterangan / jasa / barang"><input type="number" name="jumlah[]" min="1" step="1" required placeholder="Jumlah"><input type="number" name="harga_satuan[]" min="0" step="1" required placeholder="Harga satuan"><button class="btn secondary remove" type="button">Hapus</button>'; list.appendChild(row) } } updateTotal();
     </script>

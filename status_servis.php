@@ -101,7 +101,7 @@ if ($token != "") {
         <div class="header">
             <h1>AVERO KOMPUTER</h1>
             <p>Komputer - Printer - Service - Network - CCTV</p>
-            <p>ðŸ“ž 0852 1818 2280</p>
+            <p>0852 1818 2280</p>
         </div>
 
         <?php if ($data) { ?>

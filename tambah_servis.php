@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     placeholder="Charger, tas, kabel daya…"><?php echo h($_POST['kelengkapan'] ?? ''); ?></textarea><label>Foto
                     barang (JPG, PNG, WebP; maks. 8 MB)</label><input type="file" name="foto_barang" id="foto"
                     accept="image/jpeg,image/png,image/webp" capture="environment"><img id="preview" class="preview"
-                    alt="Pratinjau foto"><label>Keluhan</label><textarea name="keluhan"
+                    alt="Pratinjau foto"><p id="foto-info" class="photo-info" aria-live="polite"></p><label>Keluhan</label><textarea name="keluhan"
                     required><?php echo h($_POST['keluhan'] ?? ''); ?></textarea><label><input type="checkbox"
                         name="syarat_setuju" value="1" required class="inline-4f15898a"> Saya menyetujui syarat dan
                     ketentuan servis.</label>
@@ -199,8 +199,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             idPelanggan.value = ''; cariPelanggan.value = ''; pelangganTerpilih.hidden = true; tombolPelangganBaru.hidden = true; dataPelangganBaru.hidden = false;
             dataPelangganBaru.querySelectorAll('input,textarea').forEach(input => input.required = input.name !== 'alamat'); cariPelanggan.focus(); tutupHasilPelanggan();
         });
-        document.addEventListener('click', event => { if (!event.target.closest('.customer-search')) tutupHasilPelanggan(); });        const foto = document.getElementById('foto'), preview = document.getElementById('preview');
-        async function decodeFoto(file) { if (window.createImageBitmap) { try { return await createImageBitmap(file) } catch (e) { } } return new Promise((resolve, reject) => { const image = new Image(), url = URL.createObjectURL(file); image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight, draw: (ctx, w, h) => ctx.drawImage(image, 0, 0, w, h), close: () => URL.revokeObjectURL(url) }); image.onerror = reject; image.src = url }) } foto.addEventListener('change', async () => { const f = foto.files[0]; if (!f) return; if (!f.type.startsWith('image/')) { alert('Pilih file gambar.'); foto.value = ''; return } if (f.size > 20 * 1024 * 1024) { alert('Foto terlalu besar (maksimal 20 MB sebelum kompresi).'); foto.value = ''; return } try { const image = await decodeFoto(f); const scale = Math.min(1, 1440 / Math.max(image.width, image.height)); const canvas = document.createElement('canvas'); canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale); const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); if (image.draw) image.draw(ctx, canvas.width, canvas.height); else ctx.drawImage(image, 0, 0, canvas.width, canvas.height); if (image.close) image.close(); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .82)); if (!blob) throw new Error('Kompresi gagal'); const compressed = new File([blob], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg', lastModified: Date.now() }); const transfer = new DataTransfer(); transfer.items.add(compressed); foto.files = transfer.files; preview.src = URL.createObjectURL(compressed); preview.style.display = 'block' } catch (error) { alert('Foto tidak dapat dibaca browser. Coba pilih foto JPG atau PNG dari galeri.'); foto.value = ''; preview.style.display = 'none' } });
+        document.addEventListener('click', event => { if (!event.target.closest('.customer-search')) tutupHasilPelanggan(); });        const foto = document.getElementById('foto');
+        const preview = document.getElementById('preview');
+        const infoFoto = document.getElementById('foto-info');
+        const formServis = document.getElementById('form-servis');
+        const tombolSimpan = formServis.querySelector('button[type="submit"], button:not([type])');
+        const BATAS_UPLOAD = 7 * 1024 * 1024;
+        let urlPreviewFoto = '';
+
+        function decodeFoto(file) {
+            if (window.createImageBitmap) {
+                return createImageBitmap(file).then(bitmap => ({
+                    width: bitmap.width,
+                    height: bitmap.height,
+                    draw: (ctx, width, height) => ctx.drawImage(bitmap, 0, 0, width, height),
+                    close: () => bitmap.close()
+                }));
+            }
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                const url = URL.createObjectURL(file);
+                image.onload = () => resolve({
+                    width: image.naturalWidth,
+                    height: image.naturalHeight,
+                    draw: (ctx, width, height) => ctx.drawImage(image, 0, 0, width, height),
+                    close: () => URL.revokeObjectURL(url)
+                });
+                image.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gambar tidak dapat dibaca')); };
+                image.src = url;
+            });
+        }
+
+        function buatJpeg(canvas, kualitas) {
+            return new Promise((resolve, reject) => {
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Kompresi JPEG gagal')), 'image/jpeg', kualitas);
+            });
+        }
+
+        async function kompresFoto(file) {
+            const image = await decodeFoto(file);
+            let scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+            let kualitas = 0.82;
+            let hasil = null;
+            try {
+                for (let percobaan = 0; percobaan < 12; percobaan++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(image.width * scale));
+                    canvas.height = Math.max(1, Math.round(image.height * scale));
+                    const context = canvas.getContext('2d', { alpha: false });
+                    if (!context) throw new Error('Browser tidak dapat memproses gambar');
+                    context.fillStyle = '#fff';
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+                    image.draw(context, canvas.width, canvas.height);
+                    hasil = await buatJpeg(canvas, kualitas);
+                    canvas.width = 0;
+                    canvas.height = 0;
+                    if (hasil.size <= BATAS_UPLOAD) break;
+                    if (kualitas > 0.52) {
+                        kualitas = Math.max(0.52, kualitas - 0.1);
+                    } else {
+                        scale *= 0.82;
+                        kualitas = 0.76;
+                    }
+                }
+            } finally {
+                image.close();
+            }
+            if (!hasil || hasil.size > BATAS_UPLOAD) throw new Error('Ukuran foto belum bisa diturunkan di bawah 7 MB');
+            const nama = file.name.replace(/\.[^.]+$/, '') || 'foto-servis';
+            return new File([hasil], nama + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+        }
+
+        foto.addEventListener('change', async () => {
+            const file = foto.files && foto.files[0];
+            if (!file) { infoFoto.textContent = ''; return; }
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                alert('Pilih foto JPG, PNG, atau WebP.');
+                foto.value = '';
+                return;
+            }
+            if (file.size > 30 * 1024 * 1024) {
+                alert('Foto sumber terlalu besar untuk diproses di HP (maksimal 30 MB).');
+                foto.value = '';
+                return;
+            }
+            infoFoto.textContent = 'Sedang mengecilkan ukuran foto...';
+            tombolSimpan.disabled = true;
+            try {
+                const hasil = await kompresFoto(file);
+                const transfer = new DataTransfer();
+                transfer.items.add(hasil);
+                foto.files = transfer.files;
+                if (urlPreviewFoto) URL.revokeObjectURL(urlPreviewFoto);
+                urlPreviewFoto = URL.createObjectURL(hasil);
+                preview.src = urlPreviewFoto;
+                preview.style.display = 'block';
+                infoFoto.textContent = 'Foto siap diunggah: ' + (hasil.size / 1024 / 1024).toFixed(2) + ' MB';
+            } catch (error) {
+                foto.value = '';
+                preview.removeAttribute('src');
+                preview.style.display = 'none';
+                infoFoto.textContent = error.message || 'Foto gagal dikompres. Coba foto dengan resolusi lebih rendah.';
+            } finally {
+                tombolSimpan.disabled = false;
+            }
+        });
     </script>
 </body>
 
